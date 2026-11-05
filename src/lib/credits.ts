@@ -70,20 +70,25 @@ const listeners = new Set<() => void>();
 
 function load(): CreditState {
   const now = new Date();
-  if (!cache) {
-    cache = emptyState(now);
+  let s = cache;
+  if (!s) {
+    s = emptyState(now);
     if (typeof window !== "undefined") {
       try {
         const raw = JSON.parse(window.localStorage.getItem(CREDITS_KEY) ?? "null");
-        if (raw && typeof raw === "object") cache = { ...cache, ...raw };
+        if (raw && typeof raw === "object") s = { ...s, ...raw } as CreditState;
       } catch {
         /* ignore broken value */
       }
     }
+    cache = s;
   }
-  const next = normalize(cache, now);
-  if (next.day !== cache.day || next.month !== cache.month) save(next);
-  return cache;
+  const next = normalize(s, now);
+  if (next.day !== s.day || next.month !== s.month) {
+    save(next);
+    return next;
+  }
+  return s;
 }
 
 function save(s: CreditState) {
