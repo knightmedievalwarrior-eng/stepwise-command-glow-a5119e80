@@ -23,7 +23,6 @@ import { LanguageToggle } from "./LanguageToggle";
 import { RunIndicator } from "./RunIndicator";
 import { SupabaseSettingsDialog } from "./SupabaseSettingsDialog";
 import { ThemeSwitcher } from "./ThemeSwitcher";
-import { TrialBadge } from "./TrialBadge";
 
 export function AppHeader() {
   const { t } = useT();
@@ -45,7 +44,6 @@ export function AppHeader() {
           <LanguageToggle />
           <ThemeSwitcher />
           <RunIndicator />
-          <TrialBadge />
           <SupabaseSettingsDialog />
           <Tooltip>
             <TooltipTrigger asChild>

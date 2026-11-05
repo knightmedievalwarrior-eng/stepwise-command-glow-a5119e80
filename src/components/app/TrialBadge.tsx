@@ -1,6 +1,6 @@
-import { ArrowLeft, Check, Clock, Crown, Info } from "lucide-react";
+import { ArrowLeft, Check, Crown, Info } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -12,72 +12,19 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { PLAN, PROMPTPAY_ID, promptPayPayload } from "@/lib/payment";
-import { TRIAL_DAYS, trialDaysLeft, useTrialStart } from "@/lib/trial";
 import { cn } from "@/lib/utils";
 
 const PERKS = ["สั่งงานบอทได้ไม่จำกัด", "เชื่อม n8n ส่งงานจริง", "ถาม AI ผู้ช่วยได้ต่อเนื่อง"];
 const baht = (n: number) => `฿${n.toLocaleString("th-TH")}`;
 
-/** Header badge with days left in the free trial; opens the upgrade window. */
-export function TrialBadge() {
-  const startedAt = useTrialStart();
-  const [open, setOpen] = useState(false);
-  const autoOpened = useRef(false);
-  const daysLeft = startedAt === null ? null : trialDaysLeft(startedAt, Date.now());
-  const expired = daysLeft === 0;
-
-  useEffect(() => {
-    if (expired && !autoOpened.current) {
-      autoOpened.current = true;
-      setOpen(true);
-    }
-  }, [expired]);
-
-  if (daysLeft === null) return null;
-
-  return (
-    <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        aria-label={expired ? "หมดเวลาทดลองใช้งาน อัปเกรดเพื่อใช้งานต่อ" : `ทดลองใช้งานฟรี เหลือเวลาอีก ${daysLeft} วัน`}
-        className={cn(
-          "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors",
-          expired
-            ? "border-destructive/40 bg-destructive/10 text-destructive hover:border-destructive"
-            : "border-signal/30 bg-signal-soft text-foreground hover:border-signal",
-        )}
-      >
-        <Clock className={cn("size-3.5", expired ? "text-destructive" : "text-signal")} />
-        {expired ? (
-          <>
-            <span className="hidden sm:inline">หมดเวลาทดลองใช้</span>
-            <span className="sm:hidden">หมดเวลา</span>
-          </>
-        ) : (
-          <>
-            <span className="hidden lg:inline">ทดลองใช้งานฟรี (เหลือเวลาอีก {daysLeft} วัน)</span>
-            <span className="hidden sm:inline lg:hidden">ทดลองฟรี · เหลือ {daysLeft} วัน</span>
-            <span className="sm:hidden">{daysLeft} วัน</span>
-          </>
-        )}
-      </button>
-      <UpgradeDialog open={open} onOpenChange={setOpen} daysLeft={daysLeft} />
-    </>
-  );
-}
-
 export function UpgradeDialog({
   open,
   onOpenChange,
-  daysLeft,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
-  daysLeft: number;
 }) {
   const [step, setStep] = useState<"plan" | "pay">("plan");
-  const expired = daysLeft === 0;
   const sample = !PROMPTPAY_ID;
   const qrValue = sample ? "ตัวอย่าง QR — ยังไม่ใช่บัญชีรับเงินจริง" : promptPayPayload(PROMPTPAY_ID, PLAN.price);
 
@@ -93,18 +40,9 @@ export function UpgradeDialog({
         {step === "plan" ? (
           <>
             <DialogHeader>
-              <span
-                className={cn(
-                  "mb-1 inline-flex w-fit items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium",
-                  expired ? "bg-destructive/10 text-destructive" : "bg-signal-soft text-foreground",
-                )}
-              >
-                <Clock className="size-3.5" />
-                {expired ? `ครบ ${TRIAL_DAYS} วันทดลองใช้แล้ว` : `เหลือเวลาทดลองอีก ${daysLeft} วัน`}
-              </span>
-              <DialogTitle>{expired ? "หมดเวลาทดลองใช้งานฟรี" : "อัปเกรดก่อนหมดเวลาทดลอง"}</DialogTitle>
+              <DialogTitle>อัปเกรดเป็นแพ็กเกจเสียเงิน</DialogTitle>
               <DialogDescription>
-                อัปเกรดเพื่อใช้ Task Runner ต่อได้โดยไม่สะดุด งานและประวัติในเบราว์เซอร์นี้ยังอยู่ครบ
+                ปลดล็อกธีมพิเศษและฟีเจอร์เพิ่มเติม งานและประวัติในเบราว์เซอร์นี้ยังอยู่ครบ
               </DialogDescription>
             </DialogHeader>
 
@@ -133,7 +71,7 @@ export function UpgradeDialog({
                 className="w-full bg-signal text-signal-foreground hover:bg-signal/90"
                 onClick={() => setStep("pay")}
               >
-                อัปเกรดเพื่อใช้งานต่อ
+                อัปเกรด
               </Button>
               <Button variant="ghost" className="w-full" onClick={() => onOpenChange(false)}>
                 ไว้ทีหลัง

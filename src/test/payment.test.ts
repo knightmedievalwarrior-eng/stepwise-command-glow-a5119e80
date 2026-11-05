@@ -1,25 +1,6 @@
 import { describe, expect, it } from "vitest";
 
 import { promptPayPayload } from "@/lib/payment";
-import { TRIAL_DAYS, trialDaysLeft } from "@/lib/trial";
-
-const DAY = 86_400_000;
-
-describe("free trial", () => {
-  it("lasts 15 days", () => {
-    expect(TRIAL_DAYS).toBe(15);
-    expect(trialDaysLeft(0, 0)).toBe(15);
-  });
-
-  it("shows 1 day left on the last day", () => {
-    expect(trialDaysLeft(0, 14.5 * DAY)).toBe(1);
-  });
-
-  it("is over once 15 days have passed", () => {
-    expect(trialDaysLeft(0, 15 * DAY)).toBe(0);
-    expect(trialDaysLeft(0, 40 * DAY)).toBe(0);
-  });
-});
 
 describe("PromptPay QR", () => {
   it("matches the standard code for a phone number without amount", () => {
