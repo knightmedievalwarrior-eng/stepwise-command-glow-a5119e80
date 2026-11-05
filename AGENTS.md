@@ -18,4 +18,4 @@
 - Completing a run must call `finishTask`, which deletes the task data and records the history entry in one step.
 - AI chat replies render via Streamdown without the mermaid plugin; mermaid's graphlib/dagre chunks caused a blank screen in production builds.
 - Language (TH/EN) and colour theme are UI preferences in localStorage via `src/lib/i18n.ts` and `src/lib/theme.ts`; never introduce a second i18n or theming mechanism.
-- Special (paid) themes gate on `src/lib/plan.ts` (`isPro`); locked choices open the shared upgrade dialog through `src/lib/upgrade.ts` (UpgradeDialogHost is mounted once in `src/routes/__root.tsx`).
+- Credits (free daily + packs + Pro monthly) live in `src/lib/credits.ts`, deducted in `launchRun` and checked before a run starts. Special (paid) themes gate on `src/lib/plan.ts` (`isPro`); locked choices open the shared upgrade dialog through `src/lib/upgrade.ts` (UpgradeDialogHost is mounted once in `src/routes/__root.tsx`).

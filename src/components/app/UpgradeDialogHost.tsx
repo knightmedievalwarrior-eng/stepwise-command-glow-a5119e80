@@ -1,6 +1,6 @@
 import { setUpgradeOpen, useUpgradeOpen } from "@/lib/upgrade";
 
-import { UpgradeDialog } from "./TrialBadge";
+import { UpgradeDialog } from "./UpgradeDialog";
 
 /**
  * Mounted once in the root: renders the shared upgrade dialog whenever any

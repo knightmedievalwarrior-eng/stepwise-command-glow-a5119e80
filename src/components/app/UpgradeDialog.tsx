@@ -11,10 +11,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { PLAN, PROMPTPAY_ID, promptPayPayload } from "@/lib/payment";
+import { useCredits } from "@/lib/credits";
+import { PACKAGES, PROMPTPAY_ID, promptPayPayload, type PackageId } from "@/lib/payment";
 import { cn } from "@/lib/utils";
 
-const PERKS = ["สั่งงานบอทได้ไม่จำกัด", "เชื่อม n8n ส่งงานจริง", "ถาม AI ผู้ช่วยได้ต่อเนื่อง"];
+const PRO_PERKS = ["25,000 เครดิตทุกเดือน", "ดาวน์โหลดรายงานสรุปเป็น Excel", "ตั้งเวลาทำงานล่วงหน้า", "ปลดล็อกธีมพิเศษ"];
 const baht = (n: number) => `฿${n.toLocaleString("th-TH")}`;
 
 export function UpgradeDialog({
@@ -25,6 +26,9 @@ export function UpgradeDialog({
   onOpenChange: (v: boolean) => void;
 }) {
   const [step, setStep] = useState<"plan" | "pay">("plan");
+  const [pick, setPick] = useState<PackageId>("pack");
+  const PLAN = PACKAGES[pick];
+  const credits = useCredits();
   const sample = !PROMPTPAY_ID;
   const qrValue = sample ? "ตัวอย่าง QR — ยังไม่ใช่บัญชีรับเงินจริง" : promptPayPayload(PROMPTPAY_ID, PLAN.price);
 
@@ -40,29 +44,51 @@ export function UpgradeDialog({
         {step === "plan" ? (
           <>
             <DialogHeader>
-              <DialogTitle>อัปเกรดเป็นแพ็กเกจเสียเงิน</DialogTitle>
+              <DialogTitle>เติมเครดิต / อัปเกรด</DialogTitle>
               <DialogDescription>
-                ปลดล็อกธีมพิเศษและฟีเจอร์เพิ่มเติม งานและประวัติในเบราว์เซอร์นี้ยังอยู่ครบ
+                ใช้ฟรีทุกวัน 250 เครดิต (รีเฟรชเวลา 00:00) · สั่งงาน 1 ครั้ง = 20 เครดิต
+                {credits && <> · ตอนนี้เหลือ {credits.total.toLocaleString("th-TH")} เครดิต</>}
               </DialogDescription>
             </DialogHeader>
 
-            <div className="rounded-xl border border-border bg-card p-4">
-              <div className="flex items-baseline justify-between gap-2">
-                <span className="flex items-center gap-2 font-medium">
-                  <Crown className="size-4 text-signal" /> {PLAN.name}
-                </span>
-                <span>
-                  <span className="font-mono text-2xl font-semibold">{baht(PLAN.price)}</span>
-                  <span className="text-sm text-muted-foreground"> / {PLAN.period}</span>
-                </span>
-              </div>
-              <ul className="mt-3 space-y-1.5 text-sm">
-                {PERKS.map((p) => (
-                  <li key={p} className="flex items-center gap-2">
-                    <Check className="size-4 text-success" /> {p}
-                  </li>
-                ))}
-              </ul>
+            <div className="space-y-2">
+              {(Object.keys(PACKAGES) as PackageId[]).map((id) => {
+                const p = PACKAGES[id];
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setPick(id)}
+                    aria-pressed={pick === id}
+                    className={cn(
+                      "w-full rounded-xl border bg-card p-4 text-left transition-colors",
+                      pick === id ? "border-signal ring-1 ring-signal" : "border-border hover:border-signal/50",
+                    )}
+                  >
+                    <div className="flex items-baseline justify-between gap-2">
+                      <span className="flex items-center gap-2 font-medium">
+                        <Crown className="size-4 text-signal" /> {p.name}
+                      </span>
+                      <span>
+                        <span className="font-mono text-2xl font-semibold">{baht(p.price)}</span>
+                        {id === "pro" && <span className="text-sm text-muted-foreground"> / เดือน</span>}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {p.credits.toLocaleString("th-TH")} เครดิต · {p.note}
+                    </p>
+                    {id === "pro" && (
+                      <ul className="mt-2 space-y-1 text-sm">
+                        {PRO_PERKS.map((x) => (
+                          <li key={x} className="flex items-center gap-2">
+                            <Check className="size-4 text-success" /> {x}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </button>
+                );
+              })}
             </div>
 
             <DialogFooter className="gap-2 sm:flex-col sm:space-x-0">
@@ -71,7 +97,7 @@ export function UpgradeDialog({
                 className="w-full bg-signal text-signal-foreground hover:bg-signal/90"
                 onClick={() => setStep("pay")}
               >
-                อัปเกรด
+                ชำระเงิน {baht(PLAN.price)}
               </Button>
               <Button variant="ghost" className="w-full" onClick={() => onOpenChange(false)}>
                 ไว้ทีหลัง
@@ -109,7 +135,7 @@ export function UpgradeDialog({
               <div className="text-center">
                 <p className="font-mono text-xl font-semibold">{baht(PLAN.price)}</p>
                 <p className="text-xs text-muted-foreground">
-                  {PLAN.name} · {PLAN.period}ละครั้ง
+                  {PLAN.name} · {PLAN.credits.toLocaleString("th-TH")} เครดิต
                 </p>
               </div>
             </div>
@@ -118,7 +144,7 @@ export function UpgradeDialog({
               <Info className="mt-0.5 size-3.5 shrink-0" />
               {sample
                 ? "QR นี้เป็นตัวอย่างเท่านั้น ยังสแกนจ่ายไม่ได้ จนกว่าจะตั้งค่าบัญชีพร้อมเพย์สำหรับรับเงิน"
-                : "หลังโอนแล้ว กรุณาส่งสลิปให้ผู้ดูแลระบบเพื่อเปิดสิทธิ์ใช้งานต่อ ระบบจะไม่ปลดล็อกให้อัตโนมัติ"}
+                : "หลังโอนแล้ว กรุณาส่งสลิปให้ผู้ดูแลระบบเพื่อเพิ่มเครดิตให้ ระบบจะไม่เพิ่มให้อัตโนมัติ"}
             </p>
 
             <DialogFooter>
