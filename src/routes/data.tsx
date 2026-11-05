@@ -1,7 +1,7 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import {
   ArrowLeft,
-  Broom,
+  BrushCleaning as Broom,
   CheckCircle2,
   Copy,
   Download,
@@ -93,9 +93,9 @@ function DataStudio() {
       setTables(parsed);
       setActive(0);
       setPrev(null);
-      setDestTable(suggestTable(file.name, parsed[0].name));
+      setDestTable(suggestTable(file.name, parsed[0]!.name));
       toast.success(
-        t(`อ่านไฟล์สำเร็จ · ${parsed[0].rows.length} แถว`, `Parsed · ${parsed[0].rows.length} rows`),
+        t(`อ่านไฟล์สำเร็จ · ${parsed[0]!.rows.length} แถว`, `Parsed · ${parsed[0]!.rows.length} rows`),
         { description: t("ประมวลผลในเบราว์เซอร์นี้ 100%", "Processed 100% in this browser") },
       );
     } catch {

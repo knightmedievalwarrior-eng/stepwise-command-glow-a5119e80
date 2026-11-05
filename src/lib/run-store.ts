@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { tt, tx } from "./i18n";
 import { getN8nConfig } from "./n8n/config";
 import { initialProgress, type StepProgress } from "./n8n/protocol";
+import { RUN_COST, spendCredits } from "./credits";
 import { startRun, type LogLine, type RunControl, type RunMode } from "./runner";
 import { finishTask, getState, uid, updateTask, type Task } from "./session-store";
 import { TASKS, type TaskType } from "./tasks/definitions";
@@ -70,6 +71,7 @@ export function launchRun(task: Task): LiveRun {
   if (existing && (existing.phase === "running" || existing.phase === "paused")) return existing;
 
   const def = TASKS[task.type];
+  spendCredits(RUN_COST);
   const config = getN8nConfig();
   const mode: RunMode = config.url ? "n8n" : "simulate";
   const startedAt = Date.now();

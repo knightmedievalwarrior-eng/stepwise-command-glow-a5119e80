@@ -19,6 +19,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useT } from "@/lib/i18n";
 import { wipeAll } from "@/lib/session-store";
 
+import { CreditBadge } from "./CreditBadge";
 import { LanguageToggle } from "./LanguageToggle";
 import { RunIndicator } from "./RunIndicator";
 import { SupabaseSettingsDialog } from "./SupabaseSettingsDialog";
@@ -44,6 +45,7 @@ export function AppHeader() {
           <LanguageToggle />
           <ThemeSwitcher />
           <RunIndicator />
+          <CreditBadge />
           <SupabaseSettingsDialog />
           <Tooltip>
             <TooltipTrigger asChild>

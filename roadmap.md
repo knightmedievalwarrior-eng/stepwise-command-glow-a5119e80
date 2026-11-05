@@ -5,4 +5,5 @@
 - [x] Step 3b — Theme switcher (Light / Dark / Custom themes) with locked premium themes + upgrade badge
 - [x] Step 3c — Stability check: webhook + progress bar unaffected (tests + browser check)
 - [x] Remove the 15-day free trial (badge, countdown, auto-popup)
-- [ ] Daily free credit limit (like typical AI apps) — waiting on user: what uses credits and how many per day
+- [x] Daily free credit limit (250/day, 20 per task, Credit Pack, Monthly Pro Pass)
+- [ ] Confirm Monthly Pro Pass price (149–199 ฿; set to 199 for now) — waiting on user

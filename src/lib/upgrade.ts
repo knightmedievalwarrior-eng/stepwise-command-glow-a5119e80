@@ -1,4 +1,4 @@
-/** Opens the upgrade window from anywhere (trial badge, locked themes). */
+/** Opens the upgrade window from anywhere (credit badge, locked themes, out of credits). */
 import { useSyncExternalStore } from "react";
 
 let open = false;

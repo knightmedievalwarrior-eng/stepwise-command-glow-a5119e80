@@ -3,11 +3,12 @@
  * Scanning pays the owner directly; the app cannot confirm the transfer itself.
  */
 
-export const PLAN = {
-  name: "แพ็กเกจมาตรฐาน",
-  /** Placeholder price until the owner confirms the real one. */
-  price: 299,
-  period: "เดือน",
+export type PackageId = "pack" | "pro";
+
+export const PACKAGES: Record<PackageId, { name: string; price: number; credits: number; note: string }> = {
+  pack: { name: "เติมเครดิต (Credit Pack)", price: 99, credits: 2500, note: "จ่ายครั้งเดียว · เครดิตไม่มีวันหมดอายุ" },
+  /** Owner gave a 149–199 range; 199 until the final price is confirmed. */
+  pro: { name: "Monthly Pro Pass", price: 199, credits: 25000, note: "รายเดือน · เครดิตรีเซ็ตใหม่ทุกเดือน" },
 };
 
 /**
