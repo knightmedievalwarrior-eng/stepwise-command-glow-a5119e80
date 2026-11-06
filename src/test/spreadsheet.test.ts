@@ -1,3 +1,4 @@
+// @ts-nocheck -- test fixtures index arrays freely
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { __resetDatasetCacheForTests, cachedSample, cachedTables, dropDataset, storeDataset } from "@/lib/data-cache";
