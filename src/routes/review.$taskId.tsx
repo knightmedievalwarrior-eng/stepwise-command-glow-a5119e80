@@ -1,5 +1,6 @@
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
-import { AlertTriangle, ArrowLeft, Pencil, Rocket, ShieldCheck, Webhook } from "lucide-react";
+import { AlertTriangle, ArrowLeft, CalendarClock, Pencil, Rocket, ShieldCheck, Webhook } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
 import { N8nSettingsDialog } from "@/components/app/N8nSettingsDialog";
@@ -77,6 +78,21 @@ function Review({ task }: { task: Task }) {
   const edit = (i: number) => {
     updateTask(task.id, { stepIndex: i });
     void navigate({ to: "/wizard/$taskId", params: { taskId: task.id } });
+  };
+
+  const cost = taskCost(task);
+  const [when, setWhen] = useState("");
+  const schedule = () => {
+    if (invalidStep >= 0) return edit(invalidStep);
+    const at = new Date(when).getTime();
+    if (!Number.isFinite(at) || at <= Date.now()) {
+      toast.error(t("เลือกเวลาในอนาคต", "Pick a time in the future"));
+      return;
+    }
+    dismissRun(task.id);
+    updateTask(task.id, { status: "ready", lastRun: undefined, scheduledAt: at });
+    toast.success(t("ตั้งเวลาแล้ว", "Scheduled"), { description: new Date(at).toLocaleString(lang === "en" ? "en-GB" : "th-TH") });
+    void navigate({ to: "/" });
   };
 
   const submit = () => {
@@ -240,12 +256,30 @@ function Review({ task }: { task: Task }) {
                 }
               />
             </div>
+            <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs">
+              <CalendarClock className="size-3.5 shrink-0" />
+              <span>{t("ตั้งเวลาให้บอททำเอง", "Schedule the bot")}</span>
+              <Input
+                type="datetime-local"
+                aria-label={t("เวลาที่จะให้บอทเริ่ม", "When the bot should start")}
+                value={when}
+                onChange={(e) => setWhen(e.target.value)}
+                className="h-8 w-auto flex-1 text-xs"
+              />
+              <Button variant="outline" size="sm" disabled={!confirmed || !when} onClick={schedule}>
+                {t("ตั้งเวลา", "Schedule")}
+              </Button>
+              <span className="w-full text-muted-foreground">
+                {t("บอทจะเริ่มเองเมื่อถึงเวลา ขณะที่เปิดแอปนี้ไว้", "The bot starts on time while this app is open")}
+              </span>
+            </div>
             <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
               <Button asChild variant="outline" size="lg">
                 <Link to="/">{t("บันทึกไว้ทำต่อภายหลัง", "Save and finish later")}</Link>
               </Button>
               <Button variant="signal" size="lg" disabled={!confirmed} onClick={submit}>
                 <Rocket /> {last ? t("ยืนยันและส่งใหม่", "Confirm and resend") : t("ยืนยันและส่งให้บอททำงาน", "Confirm and send to bot")}
+                <span className="font-mono text-xs opacity-80">· {cost} {t("เครดิต", "cr")}</span>
               </Button>
             </div>
           </div>
