@@ -8,6 +8,7 @@
  */
 import { useSyncExternalStore } from "react";
 
+import { creditCost, type CostKind } from "./credit-cost";
 import { isPro } from "./plan";
 
 export const FREE_DAILY = 250;
@@ -97,7 +98,29 @@ function save(s: CreditState) {
   listeners.forEach((l) => l());
 }
 
-export function getBalance() {
+type Balance = { free: number; monthly: number; pack: number; total: number };
+
+/** Balance from the signed-in account (user_profiles); null for guests. */
+let server: (Balance & { pro: boolean }) | null = null;
+let signedIn = false;
+
+function setServer(row: { free: number; monthly: number; pack: number; total: number; is_pro: boolean } | null) {
+  server = row ? { free: row.free, monthly: row.monthly, pack: row.pack, total: row.total, pro: row.is_pro } : null;
+  listeners.forEach((l) => l());
+}
+
+/** Re-reads the account balance (call after sign-in/out). */
+export async function refreshServerCredits(isSignedIn: boolean) {
+  signedIn = isSignedIn;
+  if (!isSignedIn) return setServer(null);
+  const { supabase } = await import("@/integrations/supabase/client");
+  const { data, error } = await supabase.rpc("my_credits");
+  if (error) return;
+  setServer(data?.[0] ?? null);
+}
+
+export function getBalance(): Balance {
+  if (server) return { free: server.free, monthly: server.monthly, pack: server.pack, total: server.total };
   return balance(load(), isPro());
 }
 
@@ -105,12 +128,30 @@ export function canAfford(cost = RUN_COST): boolean {
   return getBalance().total >= cost;
 }
 
-/** Spends credits for one run; false when there aren't enough. */
+/** Spends local (guest) credits; false when there aren't enough. */
 export function spendCredits(cost = RUN_COST): boolean {
   const next = spend(load(), cost, isPro());
   if (!next) return false;
   save(next);
   return true;
+}
+
+/**
+ * Charges one task. Signed-in users are charged by the server (cost worked
+ * out there from the task kind and size); guests locally.
+ */
+export async function chargeTask(kind: CostKind, units = 0): Promise<{ ok: boolean; cost: number }> {
+  const cost = creditCost(kind, units);
+  if (!signedIn) return { ok: spendCredits(cost), cost };
+  const { supabase } = await import("@/integrations/supabase/client");
+  const { data, error } = await supabase.rpc("spend_credits", { _kind: kind, _units: units });
+  if (error || !data?.[0]) {
+    void refreshServerCredits(true);
+    return { ok: false, cost };
+  }
+  const row = data[0];
+  setServer(row);
+  return { ok: true, cost: row.cost };
 }
 
 /** Adds non-expiring pack credits (used after the admin confirms a payment). */
@@ -142,4 +183,6 @@ export function useCredits() {
 export function __resetCreditsForTests() {
   cache = null;
   snap = null;
+  server = null;
+  signedIn = false;
 }
