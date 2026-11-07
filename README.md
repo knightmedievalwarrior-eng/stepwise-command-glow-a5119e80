@@ -1,40 +1,48 @@
-# Stepwise Command Center (Task Runner SaaS)
+# ⚡ Stepwise Command Center (Task Runner SaaS)
 
-## 📌 Project Overview
-Stepwise Command Center is a scalable, **100% Local-First & Privacy-First** SaaS application designed for office workers, accountants, and operations teams to automate repetitive tasks (such as Excel, Google Sheets, and document processing) directly inside their web browser.
+**Stepwise Command Center** is a 100% Local-First & Zero-Knowledge automation platform designed to eliminate tedious, repetitive tasks (focusing first on **Excel & CSV workflows**) for office workers, accountants, and ops teams—directly inside their web browser.
 
 ---
 
-## 🛠️ Architecture & Tech Stack
-- **Frontend / UI:** Built via Lovable (v0-style responsive layout, supports mobile, tablet, and desktop).
-- **Backend & Auth:** **Supabase** (handles secure user authentication, RLS security policies, and user profiles/metadata).
-- **Processing Engine:** **Client-Side Processing (Local-First)** using browser memory and parsing libraries (e.g., SheetJS/xlsx) to ensure absolute data privacy and zero server-side file storage.
-- **Version Control:** GitHub (Single Source of Truth for seamless multi-account collaboration).
+## 🎯 Primary Purpose & Vision
+- **Core Mission:** Solve high-pain repetitive tasks end-to-end with zero learning curve.
+- **Initial Focus:** Master 100% of Excel & CSV workflows (Thailand market first), then expand to Google Sheets, document processing, and global markets.
+- **Business Goal:** Fully automated, self-sustaining SaaS model with zero server data costs.
+
+---
+
+## 🏗️ Architecture & Zero-Knowledge Guarantee (Cost = $0)
+Stepwise runs entirely on the user's device (**Local-First**) using **IndexedDB & OPFS**, eliminating central data center storage, ensuring compliance (PDPA/GDPR), and removing privacy leakage risks via **5 Core Engineering Principles**:
+
+1. **Persist Storage:** Uses `navigator.storage.persist()` to prevent OS/Browser auto-eviction of local data.
+2. **GitHub OAuth Web Flow:** Auto-creates Private Repositories & syncs user data seamlessly without complex manual Git setup.
+3. **UUID JSON Splitting:** Stores records in granular UUID JSON files to eliminate Git sync conflicts.
+4. **Two-Tier Trash System:** Soft-deletes items locally for 30 days before running a background auto-purge on GitHub (or instant hard delete).
+5. **Stateless Zero-Log Proxy:** Uses Cloudflare Workers to bypass CORS and prevent API Key exposure without storing any logs.
 
 ---
 
 ## ✨ Key Features
-1. **Command Center Hub:** 
-   - Bilingual support (**TH / EN**) and Light/Dark Theme toggle[cite: 3].
-   - AI Chat Command interface with Privacy-First execution badges (*"100% ในเครื่อง - เป็นส่วนตัว"*)[cite: 3].
-   - Quick Actions menu for high-pain workflows (e.g., Quotation Generation, Customer Data Entry, Document Sorting)[cite: 3].
-2. **Local-First Excel/CSV Studio:**
-   - Drag-and-drop file upload zone.
-   - Client-side data parsing and cleaning without sending sensitive corporate files to external cloud storage.
-3. **Secure Hybrid Monetization:**
-   - Built-in trial period management (e.g., 15-day trial countdown) and flexible usage/subscription tier checks.
-   - Row Level Security (RLS) enabled on Supabase to isolate user data completely.
+
+- **Real-Time Step Execution:** Visual progress tracking with step counters (e.g., `Step 2/5`) and live execution status.
+- **Omnichannel Access:** Works seamlessly on Mobile, Laptop, Desktop, or embedded directly inside major platforms (LINE, FB Messenger, Gmail).
+- **Scheduled & Pending Tasks:** Set cron/time-based automation triggers and monitor uncompleted or backlogged tasks.
+- **Self-Healing Automation:** Automatically detects execution errors, attempts local self-correction, or provides instant user-friendly feedback.
+- **Bilingual & Custom Themes:** Instant TH/EN language toggle and Theme Switcher (Light/Dark/Custom locked tiers).
 
 ---
 
-## 🔒 Privacy & Security Guarantee
-- **No-Storage / Privacy-First Policy:** All tabular data and processing occur locally within the user's browser[cite: 3]. Data is cleared immediately upon session end, protecting corporate privacy and ensuring compliance.
-- **Cost Optimization:** Minimized server API calls and client-side caching architecture designed to scale smoothly from hundreds to millions of users without runaway infrastructure costs.
+## 💳 Monetization Models
+
+1. **Daily Credit Package (Freemium):**
+   - Free Tier: **250 credits/day** (refreshed daily).
+   - Standard execution deducts **20 credits/run** (scaled dynamically based on task complexity).
+2. **Usage & Duration Tier:**
+   - Metered pricing based on active user volume and operational duration.
 
 ---
 
-## 🚀 Live App & Development
-- **Live Preview:** [Stepwise Command Center Preview](https://stepwise-command-center.lovable.app)[cite: 3]
-- **Lovable Workspace:** [Edit in Lovable](https://lovable.dev/projects/bd37507d-aa58-4a7d-bc17-866ac358add3)[cite: 3]
-
----
+## 🛠️ Tech Stack
+- **Frontend / UI:** React, Vite, Tailwind CSS, Shadcn UI (Responsive across Mobile, Tablet, Desktop).
+- **Local Engine:** Client-Side Parsing (`SheetJS/xlsx`), IndexedDB / OPFS.
+- **Sync & Proxy:** GitHub API (OAuth Flow), Cloudflare Workers (Zero-Log Stateless Proxy).
