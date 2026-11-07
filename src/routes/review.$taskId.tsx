@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { useT, type Lang } from "@/lib/i18n";
 import { useN8nConfig, webhookHost } from "@/lib/n8n/config";
 import { canAfford } from "@/lib/credits";
+import { taskCost } from "@/lib/credit-cost";
 import { dismissRun } from "@/lib/run-store";
 import { openUpgrade } from "@/lib/upgrade";
 import { toast } from "sonner";
@@ -80,7 +81,7 @@ function Review({ task }: { task: Task }) {
 
   const submit = () => {
     if (invalidStep >= 0) return edit(invalidStep);
-    if (!canAfford()) {
+    if (!canAfford(taskCost(task))) {
       toast.error(t("เครดิตไม่พอ", "Not enough credits"), {
         description: t("เครดิตฟรีจะรีเฟรชเวลา 00:00 หรือเติมเครดิตเพื่อใช้งานต่อ", "Free credits refill at 00:00, or top up to continue"),
       });

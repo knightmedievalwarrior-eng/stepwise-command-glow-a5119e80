@@ -9,7 +9,9 @@ import { toast } from "sonner";
 import { tt, tx } from "./i18n";
 import { getN8nConfig } from "./n8n/config";
 import { initialProgress, type StepProgress } from "./n8n/protocol";
-import { RUN_COST, spendCredits } from "./credits";
+import { taskUnits } from "./credit-cost";
+import { chargeTask } from "./credits";
+import { openUpgrade } from "./upgrade";
 import { startRun, type LogLine, type RunControl, type RunMode } from "./runner";
 import { finishTask, getState, uid, updateTask, type Task } from "./session-store";
 import { TASKS, type TaskType } from "./tasks/definitions";
@@ -71,7 +73,19 @@ export function launchRun(task: Task): LiveRun {
   if (existing && (existing.phase === "running" || existing.phase === "paused")) return existing;
 
   const def = TASKS[task.type];
-  spendCredits(RUN_COST);
+  // Charge by task complexity; if the charge is refused, stop the run right away.
+  void chargeTask(task.type, taskUnits(task.type, task.data)).then(({ ok }) => {
+    if (ok) return;
+    const r = runs.get(task.id);
+    if (!r || (r.phase !== "running" && r.phase !== "paused")) return;
+    controls.get(task.id)?.cancel();
+    controls.delete(task.id);
+    runs.delete(task.id);
+    if (getState().tasks.some((t) => t.id === task.id)) updateTask(task.id, { lastRun: undefined, status: "ready" });
+    emit();
+    toast.error(tt("เครดิตไม่พอ งานถูกหยุด", "Not enough credits — the task was stopped"));
+    openUpgrade();
+  });
   const config = getN8nConfig();
   const mode: RunMode = config.url ? "n8n" : "simulate";
   const startedAt = Date.now();
